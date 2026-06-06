@@ -9,7 +9,6 @@
 //
 // WHERE IT EARNS ITS PLACE: the highest-value upgrade to slider-heavy panels —
 // compact, unbounded in screen space, precise; click-to-type for exact entry.
-// 値そのものが操作子。ドラッグで微調整、クリックで直接入力。
 //
 // Conventions (§3): shift=coarse/alt=fine modifiers, dbl-click reset, keyboard
 // arrows/Page, typeable readout (full-width digits parsed), units, role=slider.

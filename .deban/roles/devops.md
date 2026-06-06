@@ -34,5 +34,6 @@ Blocked by:
 Feeds into: [[ux]]
 
 ## Session Log
+2026-06-06 — Added PWA: hand-written service-worker.js (no Workbox/Vite — honors the no-build constraint), manifest, offline.html, Pillow-generated icons (192/512/maskable/apple-180). SW cache version keyed to the cb token via the ?v= it's registered with, so bust.sh bumps already drive SW updates. Gated update toast (no unprompted skipWaiting). All assets serve 200.
 2026-06-06 — Cache-busting installed (token 7297a1e4); bust.sh confirmed re-fingerprinting and preserving the /public/ favicon prefix across bumps. WebP skipped (no libcairo).
 2026-06-06 — Init.

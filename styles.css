@@ -61,9 +61,7 @@ nav.tabs button[aria-selected="true"] { color: var(--amber); border-bottom-color
 /* ---------- per-control tab ---------- */
 .tabpanel-head { margin-bottom: 8px; }
 .tabpanel-head h2 { margin: 0; font-size: 24px; }
-.tabpanel-head .jp { font-family: var(--font-serif); color: var(--muted); font-size: 18px; margin-left: 8px; }
 .earns { color: var(--muted); font-size: 15px; max-width: 60ch; margin: 6px 0 20px; }
-.earns .jp-note { display: block; font-size: 13px; color: var(--muted); opacity: 0.85; margin-top: 2px; }
 
 .axes {
   font-family: var(--font-mono); font-size: 11px; color: var(--muted);
@@ -112,7 +110,6 @@ button.btn:hover { border-color: var(--amber); color: var(--amber); }
 }
 .cell .cell-head { display: flex; justify-content: space-between; align-items: baseline; }
 .cell .cell-name { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
-.cell .cell-jp { font-size: 13px; color: var(--muted); }
 /* Block (not flex) so width-dependent controls — track rail, ruler view, xy
    field — fill the cell instead of collapsing to their (absolutely-positioned,
    zero-width) content. Matches the per-tab .mount, which is block and works.
@@ -261,3 +258,35 @@ button.btn:hover { border-color: var(--amber); color: var(--amber); }
 .cell .mp-ruler { max-width: 100%; }
 .cell .mp-ruler-view { height: 48px; }
 .cell .mp-meter-bar { height: 30px; }
+
+/* ===================================================================
+   MOBILE + TOUCH
+   =================================================================== */
+@media (max-width: 640px) {
+  .app { padding: 56px 16px 80px; }
+  header.masthead h1 { font-size: 24px; }
+  /* tabs scroll horizontally instead of wrapping to many rows */
+  nav.tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  nav.tabs::-webkit-scrollbar { display: none; }
+  nav.tabs button { flex: 0 0 auto; }
+  .tabpanel-head h2 { font-size: 20px; }
+  .stage { padding: 28px 16px; min-height: 150px; }
+  .panel-row { gap: 14px; }
+  .compare-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
+  .exports { flex-wrap: wrap; }
+}
+
+/* larger hit targets where the pointer is coarse (touch). The .cell overrides
+   above keep the bench compact; these affect the full per-control tabs. */
+@media (pointer: coarse) {
+  .mp-track-rail { height: 40px; }
+  .mp-track-thumb { width: 18px; height: 18px; margin-top: -9px; }
+  .mp-knob-svg { width: 112px; height: 112px; }
+  .mp-arc-svg { width: 232px; height: 140px; }
+  .mp-ruler-view { height: 76px; }
+  .mp-meter-bar { height: 56px; }
+  .mp-xy-dot { width: 18px; height: 18px; }
+  .mp-scrub-readout { padding: 6px 8px; }
+  nav.tabs button { padding: 12px 16px; }
+  button.btn { padding: 12px 16px; }
+}

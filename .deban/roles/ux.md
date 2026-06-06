@@ -17,6 +17,9 @@ Owns the tabbed shell, the minimalist side-by-side landing page, the dark-editor
 | 2026-06-06 | Version badge top-left: 3 shapes + project name + small version font, from cache-busting skill | User requirement. | [[devops]] |
 | 2026-06-06 | Landing = default first tab in single index.html (no separate landing.html) | Keeps badge+meta on the one entry the owner opens; brief permitted this option. | [[devops]] |
 | 2026-06-06 | Landing hosts LIVE stripped instances of all 8 side-by-side, not thumbnails | Preserves the spec §138 comparative value the tab layout otherwise isolates. | [[pm]] |
+| 2026-06-06 | Bench is BOUND: one normalized [0,1] position drives all 8; each maps it through its own taper so endpoints align. xypad links horizontal only, vertical inert. | Owner goal: move one, get a rich visual of all moving. The true comparative-bench payoff (spec §138). | [[dev]] [[arch]] |
+| 2026-06-06 | All bilingual Japanese UI removed; display name → romaji "geejisuraidaa"; English cut to bare minimum, viz-first | Owner directive. REVERSES the 2026-06-06 "name = ゲージスライダー" choice for *display*. Functional full-width-digit (NFKC) input support is retained — that's capability, not chrome. | [[dev]] |
+| 2026-06-06 | Mobile: tabs scroll horizontally, grid reflows to ~148px cells, coarse-pointer hit targets enlarged | "Works well on mobile" — touch ergonomics without a separate layout. | [[devops]] |
 
 ## Dead Ends
 <!-- APPEND ONLY. Never delete. -->
@@ -39,6 +42,7 @@ Blocked by:
 Feeds into: [[dev]]
 
 ## Session Log
+2026-06-06 — Round 2: bound the bench (one norm drives all, xypad x-only); removed all Japanese → laconic English, name now romaji; added mobile/touch responsive CSS. Token → 1746f85a.
 2026-06-06 — Fixed landing bench: ruler/log-slider/bipolar/xypad were collapsing to 0 width in the flex cell-mount; switched mount to block. Recorded as dead end + lesson.
 2026-06-06 — Tabbed shell + live comparative landing built; badge repositioned top-left with ゲージスライダー name. Dark-editorial §7 tokens applied verbatim.
 2026-06-06 — Init.

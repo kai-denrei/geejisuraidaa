@@ -9,7 +9,6 @@
 //
 // WHERE IT EARNS ITS PLACE: the mobile height/weight-picker metaphor — the
 // needle stays put, the world moves; comfortable thumb-drag for bounded scalars.
-// モバイルの身長ピッカー方式。針は固定、目盛りが動く。
 //
 // Conventions: shift/alt modifiers, dbl-click reset, keyboard, typeable readout
 // (full-width digits), units, role=slider.

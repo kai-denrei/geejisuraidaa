@@ -52,8 +52,8 @@ export async function buildSnippet(reg) {
   ctrl = ctrl.replace(/^\s*export\s+default\s+[A-Za-z0-9_$]+;?\s*$/gm, '');
   // keep the public factory exported: `export function NAME` stays as-is.
 
-  const header = `// ${reg.title} (${reg.name}) — ${reg.jp}
-// ゲージスライダー / geejisuraidaa — self-contained snippet export.
+  const header = `// ${reg.title} (${reg.name}) — geejisuraidaa snippet.
+// Self-contained ES module: core deps inlined, no sibling files required.
 //
 // USAGE:
 //   import { ${reg.export} } from './${reg.module}.snippet.js';

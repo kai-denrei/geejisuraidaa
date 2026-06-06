@@ -8,7 +8,6 @@
 //
 // WHERE IT EARNS ITS PLACE: fixes wide-range params (iterations, scale,
 // frequency) where a linear track crushes the useful low band.
-// 桁をまたぐ範囲を対数で。低域がつぶれない。
 //
 // Conventions: shift/alt modifiers on keyboard step, dbl-click reset, keyboard,
 // typeable readout (full-width digits), units, role=slider.

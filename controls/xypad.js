@@ -8,7 +8,6 @@
 // WHERE IT EARNS ITS PLACE: position / vector / pan-tilt — two coupled params
 // in one gesture; dbl-click recenters. The contract's 2-vector case (spec §9
 // `dims`): get()/set() take and return [x,y].
-// 二値を一度に。位置・ベクトル・パン/チルト。ダブルクリックで中央へ。
 //
 // Conventions: dbl-click reset, keyboard (arrows move the dot), typeable XY
 // readouts (full-width digits), units, role=slider (2D announced via valuetext).

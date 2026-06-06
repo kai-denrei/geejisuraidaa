@@ -13,7 +13,6 @@
 //
 // WHERE IT EARNS ITS PLACE: dense panels — compact, precise fine-tuning where a
 // track would not fit. Vertical drag avoids the circular-acquisition footguns.
-// 高密度パネル向け。縦ドラッグで精密調整、円形操作の罠を回避。
 //
 // Conventions: shift/alt modifiers, dbl-click reset, keyboard, typeable readout
 // (full-width digits), units, role=slider.

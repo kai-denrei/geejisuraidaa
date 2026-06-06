@@ -9,7 +9,6 @@
 //
 // WHERE IT EARNS ITS PLACE: doubles as a readable gauge — fast to set roughly,
 // at-a-glance state. Good for "where in range" plus a live dial readout.
-// 設定とゲージを兼ねる。ひと目で現在値、タップで一気に移動。
 //
 // Conventions: dbl-click reset, keyboard, typeable readout (full-width digits),
 // units, role=slider.

@@ -9,7 +9,6 @@
 //
 // WHERE IT EARNS ITS PLACE: quantized params and dot-matrix-style readouts —
 // the fill edge is the value; no handle to chase, instantly legible as a gauge.
-// 量子化された値向け。ハンドル無し、塗りの縁が値。表示器としても明快。
 //
 // Conventions: dbl-click reset, keyboard (±1 segment), typeable readout
 // (full-width digits), units, role=slider.

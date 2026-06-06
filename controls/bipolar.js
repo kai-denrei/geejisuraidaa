@@ -7,7 +7,6 @@
 //
 // WHERE IT EARNS ITS PLACE: signed params (pan, balance, offset) where 0 is the
 // meaningful home; the center tick + deadband make true-zero easy to hit.
-// 符号付きの値。中央のデッドバンドで 0 にピタリと吸着。
 //
 // Conventions: shift/alt modifiers, dbl-click reset, keyboard, typeable readout
 // (full-width digits), units, role=slider.
