@@ -88,7 +88,7 @@ export function meter(el, opts = {}) {
     e.preventDefault();
     if (d === 'min') model.apply(o.min);
     else if (d === 'max') model.apply(o.max);
-    else model.apply(model.get() + (d > 0 ? o.step : -o.step) * (Math.abs(d) > o.step ? 3 : 1));
+    else model.apply(model.get() + d); // d is in value units (one segment = step)
     model.commit();
   }
   bar.addEventListener('keydown', onKey);
