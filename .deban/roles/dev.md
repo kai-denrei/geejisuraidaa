@@ -16,6 +16,8 @@ Implements `core/` helpers and the per-control modules to the §4 contract, the 
 | 2026-06-06 | Port the 8 prototyped controls first; math copied verbatim from spec §5 | No rediscovery; spec captured the interaction math. | [[arch]] [[pm]] |
 | 2026-06-06 | Parameter download = JSON of `opts` + the live current value (not defaults-only) | A shared param should round-trip the actual state, not just config. | [[arch]] |
 | 2026-06-06 | xypad keeps `control()` contract via `dims:2`; get/set take `[x,y]` | Spec §9 lean — scalar contract, vectors declare `dims` and widen get/set. | [[arch]] |
+| 2026-06-06 | scrub per-pixel = range/~320px (floored at step), not the spec's literal dx*step | Bounded params needed a sane full-sweep budget; dx*step cost range/step px (1000px for the demo). step retained as precision floor + quantization. opt: `sweepPx`. | [[arch]] |
+| 2026-06-06 | knob sensitivity = full range over ~100px (≈ knob height), down from spec's ~180px | User feedback: apex required too long a drag. alt=fine still gives precision. opt: `sensitivityPx`. | |
 
 ## Dead Ends
 <!-- APPEND ONLY. Never delete. -->
@@ -35,5 +37,6 @@ Blocked by: [[arch]] core helpers
 Feeds into: [[qa]]
 
 ## Session Log
+2026-06-06 — Tuned knob (≈100px full sweep) and scrub (range/320px per-pixel) sensitivity per owner feedback; both now have tunable opts.
 2026-06-06 — Built core/ + all 8 controls to §4 contract, full-width-digit NFKC entry, both export buttons per control. All pass node --check.
 2026-06-06 — Init.

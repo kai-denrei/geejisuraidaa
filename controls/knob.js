@@ -2,7 +2,9 @@
 //
 // AXES (spec §1)
 //   Acquisition: gestural, RELATIVE vertical drag (NOT circular). Sensitivity =
-//                full range over ~180px: v = v0 + (y0 − y)/180 * range * modifier.
+//                full range over SENS_PX (≈ the knob's own height): so a drag
+//                from just below the arc to its apex sweeps min→max without an
+//                over-long reach. v = v0 + (y0 − y)/SENS_PX * range * modifier.
 //   Mapping:     linear (per opts.map; lin default).
 //   Commit:      per opts.commit.
 //
@@ -27,6 +29,10 @@ export function knob(el, opts = {}) {
   const o = model.opts;
   const m = mapper(o.map, o.min, o.max);
   const range = o.max - o.min;
+  // Vertical px for a full min→max sweep. Tightened from the spec's ~180px to
+  // ~100px (≈ the rendered knob height) so the apex is reachable in one short
+  // drag; alt = fine modifier still gives precision. Tune to taste.
+  const SENS_PX = o.sensitivityPx || 100;
 
   const cx = 32, cy = 32, R = 26;
   el.classList.add('mp-knob');
@@ -69,8 +75,8 @@ export function knob(el, opts = {}) {
     onMove: ({ dy, ev, moved }) => {
       if (!moved) return;
       const mod = resolveModifier(ev);
-      // (y0 − y)/180 * range : up = increase. dy = y − y0, so use −dy.
-      model.apply(startVal + (-dy / 180) * range * mod);
+      // up = increase. dy = y − y0, so use −dy. Full range over SENS_PX px.
+      model.apply(startVal + (-dy / SENS_PX) * range * mod);
     },
     onEnd: ({ moved }) => {
       if (moved) model.commit(); else enterEdit();

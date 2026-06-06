@@ -113,7 +113,12 @@ button.btn:hover { border-color: var(--amber); color: var(--amber); }
 .cell .cell-head { display: flex; justify-content: space-between; align-items: baseline; }
 .cell .cell-name { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
 .cell .cell-jp { font-size: 13px; color: var(--muted); }
-.cell .cell-mount { min-height: 64px; display: flex; align-items: center; }
+/* Block (not flex) so width-dependent controls — track rail, ruler view, xy
+   field — fill the cell instead of collapsing to their (absolutely-positioned,
+   zero-width) content. Matches the per-tab .mount, which is block and works.
+   text-align centers the intrinsic-width controls (scrub/knob/arc). */
+.cell .cell-mount { min-height: 64px; display: block; text-align: center; }
+.cell .cell-mount > * { vertical-align: middle; }
 .cell .cell-val { font-family: var(--font-mono); font-size: 11px; color: var(--amber); font-variant-numeric: tabular-nums; }
 .landing-note { color: var(--muted); font-size: 13px; margin-top: 24px; }
 .shared-param {
@@ -250,7 +255,7 @@ button.btn:hover { border-color: var(--amber); color: var(--amber); }
 .cell .mp-scrub-readout { font-size: 20px; }
 .cell .mp-knob-svg { width: 64px; height: 64px; }
 .cell .mp-arc-svg { width: 130px; height: 78px; }
-.cell .mp-xypad { max-width: 120px; }
+.cell .mp-xypad { max-width: 120px; margin-inline: auto; }
 .cell .mp-xy-row, .cell .mp-track-row, .cell .mp-knob-row,
 .cell .mp-arc-row, .cell .mp-ruler-row, .cell .mp-meter-row { display: none; }
 .cell .mp-ruler { max-width: 100%; }

@@ -1,5 +1,7 @@
 # Session Log — geejisuraidaa
 
+2026-06-06 19:3x — FIX — Owner feedback round 1: (1) knob vertical sensitivity tightened to ~100px full sweep (opt sensitivityPx); (2) scrub per-pixel rebased to range/320px floored at step (opt sweepPx); (3) landing bench rendered ruler/log-slider/bipolar/xypad at 0 width because the flex cell-mount collapsed their absolutely-positioned children — switched mount to block (matches working per-tab mount). Recorded dead end + lesson in ux.md. Token bumped 7297a1e4→aec6c0bc. node --check passes; styles fix confirmed in served CSS.
+
 2026-06-06 19:1x — SYNC — Independently verified V1 (server 200, 17/17 node --check, badge meta + JP labels present, 4 commits). Synced build decisions into dev/arch/ux/devops/qa role files; recorded install.sh public/-root gotcha as a devops dead end. Resolved open Qs: snippet portability (arch), scope (pm), versioning (devops), name (ux).
 
 2026-06-06 17:52 — INIT — mode: solo, roles: dev, arch, pm, ux, qa, devops. Brief read from geejisuraidaa.md (codename manipulanda). 5 untested assumptions recorded in pm.md.

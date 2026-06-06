@@ -3,7 +3,8 @@
 // AXES (spec §1)
 //   Acquisition: gestural, relative — drag horizontally to nudge; the value IS
 //                the control. Click (sub-threshold) enters literal text-edit.
-//   Mapping:     linear in value units (value += dx * step * modifier).
+//   Mapping:     linear; per-pixel = range/~320px so a bounded param sweeps
+//                min→max in a comfortable drag (step stays the precision floor).
 //   Commit:      per opts.commit ('live' default | 'release').
 //
 // WHERE IT EARNS ITS PLACE: the highest-value upgrade to slider-heavy panels —
@@ -22,6 +23,17 @@ export function scrub(el, opts = {}) {
   const model = createModel(opts);
   const o = model.opts;
   const m = mapper(o.map, o.min, o.max);
+
+  // Per-pixel travel. The spec's literal form is dx*step, but for a bounded
+  // param that makes a full min→max sweep cost range/step px (here 100/0.1 =
+  // 1000px) — far too wide. Base per-pixel on the range so a full sweep takes
+  // ~FULL_PX px; keep step as the precision floor and quantization granularity
+  // (the model quantizes to step in sanitize). Unbounded → fall back to step.
+  const FULL_PX = o.sweepPx || 320;
+  const range = o.max - o.min;
+  const perPx = (o.bounded !== false && Number.isFinite(range) && range > 0)
+    ? Math.max(o.step, range / FULL_PX)
+    : o.step;
 
   el.classList.add('mp-scrub');
   el.innerHTML = `<span class="mp-scrub-readout" tabindex="0"></span><input class="mp-scrub-input" type="text" inputmode="decimal" hidden />`;
@@ -47,7 +59,7 @@ export function scrub(el, opts = {}) {
     onMove: ({ dx, ev, moved }) => {
       if (!moved) return;
       const mod = resolveModifier(ev);
-      model.apply(startVal + dx * o.step * mod);
+      model.apply(startVal + dx * perPx * mod);
     },
     onEnd: ({ moved }) => {
       if (moved) model.commit();
