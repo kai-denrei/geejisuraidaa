@@ -19,6 +19,7 @@ Owns the local static server, the cache-busting toolkit install (URL fingerprint
 <!-- APPEND ONLY. Never delete. -->
 | Date | What was tried | Why it failed / was rejected |
 |---|---|---|
+| 2026-06-06 | install.sh's default root-relative cb asset refs (`/cb-shapes/…`, `/cb-badge.js`) | Toolkit assumes `public/` IS the web root; here the server root is the project root, so those 404'd. Worked around by pointing refs at `/public/…`. Reverts cleanly if served with `--directory public`. |
 
 ## Lessons
 
@@ -33,4 +34,5 @@ Blocked by:
 Feeds into: [[ux]]
 
 ## Session Log
+2026-06-06 — Cache-busting installed (token 7297a1e4); bust.sh confirmed re-fingerprinting and preserving the /public/ favicon prefix across bumps. WebP skipped (no libcairo).
 2026-06-06 — Init.

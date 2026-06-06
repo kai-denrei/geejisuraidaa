@@ -14,6 +14,8 @@ Implements `core/` helpers and the per-control modules to the §4 contract, the 
 | Date | Decision | Rationale | Linked roles |
 |---|---|---|---|
 | 2026-06-06 | Port the 8 prototyped controls first; math copied verbatim from spec §5 | No rediscovery; spec captured the interaction math. | [[arch]] [[pm]] |
+| 2026-06-06 | Parameter download = JSON of `opts` + the live current value (not defaults-only) | A shared param should round-trip the actual state, not just config. | [[arch]] |
+| 2026-06-06 | xypad keeps `control()` contract via `dims:2`; get/set take `[x,y]` | Spec §9 lean — scalar contract, vectors declare `dims` and widen get/set. | [[arch]] |
 
 ## Dead Ends
 <!-- APPEND ONLY. Never delete. -->
@@ -33,4 +35,5 @@ Blocked by: [[arch]] core helpers
 Feeds into: [[qa]]
 
 ## Session Log
+2026-06-06 — Built core/ + all 8 controls to §4 contract, full-width-digit NFKC entry, both export buttons per control. All pass node --check.
 2026-06-06 — Init.

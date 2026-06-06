@@ -16,6 +16,7 @@ Owns the shared control contract, the `core/` helper layer, module boundaries, a
 | 2026-06-06 | Vanilla ES modules, no build step; native imports; Pointer Events + setPointerCapture; touch-action:none on drag surfaces | Spec §7. Keeps the gallery the dev surface, no toolchain. | [[dev]] [[devops]] |
 | 2026-06-06 | `core/` = map.js, gesture.js, geometry.js, a11y.js, control.js; controls are thin view+gesture layers importing core | Spec §4 layering note. | [[dev]] |
 | 2026-06-06 | Snippet export inlines required core deps into one artifact (control is not portable otherwise) | Resolves the §4-vs-portability tension. | [[dev]] [[pm]] |
+| 2026-06-06 | Snippet inlining via string-concat of named core modules (no bundler) — PROVEN | Each generated `*.snippet.js` passes node --check, keeps exactly one factory export, zero leftover import/export. Validates the §7 "no build step" bet. | [[dev]] |
 
 ## Dead Ends
 <!-- APPEND ONLY. Never delete. -->
@@ -36,4 +37,5 @@ Blocked by:
 Feeds into: [[dev]]
 
 ## Session Log
+2026-06-06 — Snippet-inlining approach validated end-to-end; xypad `dims:2` vectorization landed. No-build bet holds.
 2026-06-06 — Init. Locked no-build ES-module architecture and core/ layering from spec.

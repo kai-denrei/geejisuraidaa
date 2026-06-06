@@ -15,6 +15,8 @@ Owns the tabbed shell, the minimalist side-by-side landing page, the dark-editor
 |---|---|---|---|
 | 2026-06-06 | Dark editorial tokens (OKLCH), EB Garamond + JetBrains Mono, amber/teal accents, tabular-nums | Spec §7 design system, given verbatim. | [[dev]] |
 | 2026-06-06 | Version badge top-left: 3 shapes + project name + small version font, from cache-busting skill | User requirement. | [[devops]] |
+| 2026-06-06 | Landing = default first tab in single index.html (no separate landing.html) | Keeps badge+meta on the one entry the owner opens; brief permitted this option. | [[devops]] |
+| 2026-06-06 | Landing hosts LIVE stripped instances of all 8 side-by-side, not thumbnails | Preserves the spec §138 comparative value the tab layout otherwise isolates. | [[pm]] |
 
 ## Dead Ends
 <!-- APPEND ONLY. Never delete. -->
@@ -35,4 +37,5 @@ Blocked by:
 Feeds into: [[dev]]
 
 ## Session Log
+2026-06-06 — Tabbed shell + live comparative landing built; badge repositioned top-left with ゲージスライダー name. Dark-editorial §7 tokens applied verbatim.
 2026-06-06 — Init.

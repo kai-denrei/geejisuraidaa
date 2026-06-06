@@ -1,5 +1,7 @@
 # Session Log — geejisuraidaa
 
+2026-06-06 19:1x — SYNC — Independently verified V1 (server 200, 17/17 node --check, badge meta + JP labels present, 4 commits). Synced build decisions into dev/arch/ux/devops/qa role files; recorded install.sh public/-root gotcha as a devops dead end. Resolved open Qs: snippet portability (arch), scope (pm), versioning (devops), name (ux).
+
 2026-06-06 17:52 — INIT — mode: solo, roles: dev, arch, pm, ux, qa, devops. Brief read from geejisuraidaa.md (codename manipulanda). 5 untested assumptions recorded in pm.md.
 
 2026-06-06 19:0x — BUILD V1 — Delivered working localhost V1. Built core/ (map, gesture, geometry, a11y, control glue), all 8 controls to §4 contract, dark-editorial CSS (§7 OKLCH verbatim), tabbed shell + landing comparison page, per-control Download-parameters (opts+live value JSON) and Save-snippet (core inlined, single ES module — verified each generated snippet passes node --check and keeps one factory export). Full-width-digit NFKC parsing verified. Cache-busting installed (token 7297a1e4), badge customized top-left with ゲージスライダー/geejisuraidaa name + small muted token. Verification: 17/17 JS pass node --check, all imports resolve, all served assets 200. Server: python3 http.server 8080. Snippet export resolves the §4-vs-portability tension (arch open Q). Landing page carries the comparative-bench load (pm/ux open Q) — bench harness with time-to-target is backlog. Note: cb assets live under /public/ (served root = project root, not public/); HTML refs point there and survive bumps.
