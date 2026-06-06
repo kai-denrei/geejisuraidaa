@@ -47,7 +47,10 @@ if ('serviceWorker' in navigator) {
 
   window.addEventListener('load', async () => {
     try {
-      const reg = await navigator.serviceWorker.register(`/service-worker.js?v=${token}`, { scope: '/' });
+      // Relative to the page so scope = the app's directory — works at root and
+      // under a GitHub Pages sub-path. Default scope (the SW's own dir) is correct.
+      const swUrl = new URL(`service-worker.js?v=${token}`, document.baseURI).href;
+      const reg = await navigator.serviceWorker.register(swUrl);
       if (reg.waiting && navigator.serviceWorker.controller) promptUpdate(reg);
       reg.addEventListener('updatefound', () => {
         const sw = reg.installing;

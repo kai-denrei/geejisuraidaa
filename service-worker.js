@@ -15,12 +15,15 @@
 
 const VERSION = new URL(self.location).searchParams.get('v') || 'dev';
 const CACHE = `gs-${VERSION}`;
+// Relative URLs (resolved against the SW's own location) so this works at the
+// site root locally AND under a sub-path on GitHub Pages (/<repo>/).
+const OFFLINE = new URL('offline.html', self.location).href;
 const PRECACHE = [
-  '/offline.html',
-  '/manifest.webmanifest',
-  '/public/icons/icon-192.png',
-  '/public/icons/icon-512.png',
-  '/public/icons/icon-maskable-512.png',
+  './offline.html',
+  './manifest.webmanifest',
+  './public/icons/icon-192.png',
+  './public/icons/icon-512.png',
+  './public/icons/icon-maskable-512.png',
 ];
 
 self.addEventListener('install', (e) => {
@@ -81,9 +84,7 @@ self.addEventListener('fetch', (e) => {
         return await putCache(req, await fetch(req));
       } catch {
         const c = await caches.open(CACHE);
-        return (await c.match(req)) || (await c.match('/')) ||
-               (await c.match('/index.html')) || (await c.match('/offline.html')) ||
-               Response.error();
+        return (await c.match(req)) || (await c.match(OFFLINE)) || Response.error();
       }
     })());
     return;
