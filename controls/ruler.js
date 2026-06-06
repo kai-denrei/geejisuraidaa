@@ -27,14 +27,16 @@ export function ruler(el, opts = {}) {
   const majorEvery = o.majorEvery || 10;
 
   el.classList.add('mp-ruler');
+  if (o.variant) el.classList.add('mp-v-' + o.variant);
+  // Readout ABOVE the strip (finger/cursor never hides it).
   el.innerHTML = `
-    <div class="mp-ruler-view" tabindex="0">
-      <div class="mp-ruler-strip"></div>
-      <div class="mp-ruler-needle"></div>
-    </div>
     <div class="mp-ruler-row">
       <span class="mp-ruler-readout"></span>
       <input class="mp-ruler-input" type="text" inputmode="decimal" hidden/>
+    </div>
+    <div class="mp-ruler-view" tabindex="0">
+      <div class="mp-ruler-strip"></div>
+      <div class="mp-ruler-needle"></div>
     </div>`;
   const view = el.querySelector('.mp-ruler-view');
   const strip = el.querySelector('.mp-ruler-strip');

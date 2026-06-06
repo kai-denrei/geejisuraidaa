@@ -29,13 +29,15 @@ export function meter(el, opts = {}) {
   const m = mapper(o.map, o.min, o.max);
 
   el.classList.add('mp-meter');
+  if (o.variant) el.classList.add('mp-v-' + o.variant);
+  // Readout ABOVE the bar (finger/cursor never hides it).
   el.innerHTML = `
-    <div class="mp-meter-bar" tabindex="0">${Array.from({ length: N })
-      .map(() => '<div class="mp-meter-seg"></div>').join('')}</div>
     <div class="mp-meter-row">
       <span class="mp-meter-readout"></span>
       <input class="mp-meter-input" type="text" inputmode="decimal" hidden/>
-    </div>`;
+    </div>
+    <div class="mp-meter-bar" tabindex="0">${Array.from({ length: N })
+      .map(() => '<div class="mp-meter-seg"></div>').join('')}</div>`;
   const bar = el.querySelector('.mp-meter-bar');
   const segs = [...el.querySelectorAll('.mp-meter-seg')];
   const readout = el.querySelector('.mp-meter-readout');
@@ -47,7 +49,16 @@ export function meter(el, opts = {}) {
   function render() {
     const v = model.get();
     const lvl = levelOf(v);
-    segs.forEach((s, i) => s.classList.toggle('on', i < lvl));
+    segs.forEach((s, i) => {
+      const on = i < lvl;
+      s.classList.toggle('on', on);
+      // variant 'gradient': lit segments form a green→red gradation.
+      if (o.variant === 'gradient') {
+        const c = `hsl(${Math.round(130 * (1 - i / (N - 1)))} 65% 50%)`;
+        s.style.background = on ? c : '';
+        s.style.borderColor = on ? c : '';
+      }
+    });
     readout.textContent = `${model.format(v)}  ${lvl}/${N}`;
     updateAria(bar, { norm: clamp(m.toNorm(v), 0, 1), text: `${model.format(v)} (${lvl}/${N})` });
   }

@@ -34,13 +34,15 @@ export function xypad(el, opts = {}) {
   let val = clampPair(Array.isArray(o.value) ? o.value : [0, 0]);
 
   el.classList.add('mp-xypad');
+  if (o.variant) el.classList.add('mp-v-' + o.variant);
+  // Readouts ABOVE the field (finger/cursor never hides them).
   el.innerHTML = `
-    <div class="mp-xy-field" tabindex="0"><div class="mp-xy-dot"></div>
-      <div class="mp-xy-cross-h"></div><div class="mp-xy-cross-v"></div></div>
     <div class="mp-xy-row">
       <span class="mp-xy-lab">x</span><input class="mp-xy-x" type="text" inputmode="decimal" />
       <span class="mp-xy-lab">y</span><input class="mp-xy-y" type="text" inputmode="decimal" />
-    </div>`;
+    </div>
+    <div class="mp-xy-field" tabindex="0"><div class="mp-xy-dot"></div>
+      <div class="mp-xy-cross-h"></div><div class="mp-xy-cross-v"></div></div>`;
   const field = el.querySelector('.mp-xy-field');
   const dot = el.querySelector('.mp-xy-dot');
   const inX = el.querySelector('.mp-xy-x');

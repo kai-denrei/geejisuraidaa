@@ -35,17 +35,19 @@ export function knob(el, opts = {}) {
 
   const cx = 32, cy = 32, R = 26;
   el.classList.add('mp-knob');
+  if (o.variant) el.classList.add('mp-v-' + o.variant);
+  // Readout ABOVE the dial (finger/cursor never hides it).
   el.innerHTML = `
+    <div class="mp-knob-row">
+      <span class="mp-knob-readout"></span>
+      <input class="mp-knob-input" type="text" inputmode="decimal" hidden/>
+    </div>
     <svg viewBox="0 0 64 64" class="mp-knob-svg" tabindex="0">
       <path class="mp-knob-bg" d="${arc(cx, cy, R, 135, 405)}" fill="none"/>
       <path class="mp-knob-fill" fill="none"/>
       <line class="mp-knob-ind"/>
       <circle class="mp-knob-hub" cx="${cx}" cy="${cy}" r="6"/>
-    </svg>
-    <div class="mp-knob-row">
-      <span class="mp-knob-readout"></span>
-      <input class="mp-knob-input" type="text" inputmode="decimal" hidden/>
-    </div>`;
+    </svg>`;
   const svg = el.querySelector('.mp-knob-svg');
   const fillP = el.querySelector('.mp-knob-fill');
   const ind = el.querySelector('.mp-knob-ind');
@@ -59,6 +61,9 @@ export function knob(el, opts = {}) {
     const n = clamp(m.toNorm(v), 0, 1);
     const angle = 135 + n * 270;
     fillP.setAttribute('d', n > 0.001 ? arc(cx, cy, R, 135, angle) : '');
+    // variant fills: 'spectrum' red→green by value; 'intensity' amber→white.
+    if (o.variant === 'spectrum') fillP.style.stroke = `hsl(${Math.round(n * 120)} 70% 50%)`;
+    else if (o.variant === 'intensity') fillP.style.stroke = `hsl(40 ${Math.round(80 * (1 - n))}% ${Math.round(55 + 45 * n)}%)`;
     const a = polar(cx, cy, 14, angle);
     const b = polar(cx, cy, 30, angle);
     ind.setAttribute('x1', a.x); ind.setAttribute('y1', a.y);

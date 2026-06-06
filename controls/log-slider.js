@@ -24,14 +24,16 @@ export function logSlider(el, opts = {}) {
   const m = mapper(o.map, o.min, o.max);
 
   el.classList.add('mp-track');
+  if (o.variant) el.classList.add('mp-v-' + o.variant);
+  // Readout ABOVE the rail so a finger/cursor on the thumb never hides it.
   el.innerHTML = `
-    <div class="mp-track-rail" tabindex="0">
-      <div class="mp-track-fill"></div>
-      <div class="mp-track-thumb"></div>
-    </div>
     <div class="mp-track-row">
       <span class="mp-track-readout"></span>
       <input class="mp-track-input" type="text" inputmode="decimal" hidden />
+    </div>
+    <div class="mp-track-rail" tabindex="0">
+      <div class="mp-track-fill"></div>
+      <div class="mp-track-thumb"></div>
     </div>`;
   const rail = el.querySelector('.mp-track-rail');
   const fill = el.querySelector('.mp-track-fill');

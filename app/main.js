@@ -133,6 +133,10 @@ function buildControlTab(reg) {
       commit <b>${reg.axes.commit}</b>
     </div>
     <div class="stage"><div class="mount"></div></div>
+    <div class="fine" data-on="1">
+      <button class="fine-tog" type="button" aria-pressed="true" title="toggle the +/- buttons">± fine</button>
+      <div class="stepper"></div>
+    </div>
     <div class="panel-row">
       <div class="panel">
         <h3>event log</h3>
@@ -146,7 +150,8 @@ function buildControlTab(reg) {
         </div>
         <p class="earns" style="margin-top:14px;font-size:12px">JSON params · self-contained .js module.</p>
       </div>
-    </div>`;
+    </div>
+    <div class="variations"></div>`;
 
   const mount = view.querySelector('.mount');
   const log = view.querySelector('.log');
@@ -192,6 +197,54 @@ function buildControlTab(reg) {
     }
     setTimeout(() => { btn.textContent = prev; }, 1400);
   });
+
+  // ---- secondary control: toggleable +/- fine-tune (acts on the handle) ----
+  const stepper = view.querySelector('.stepper');
+  const step = reg.opts.step ?? 1;
+  const nudge = (sign, axis, big) => {
+    const d = step * (big ? 10 : 1) * sign;
+    if (reg.vector) { const p = handle.get(); p[axis] += d; handle.set(p); }
+    else handle.set(handle.get() + d);
+  };
+  const mkBtn = (txt, sign, axis, aria) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = txt; b.setAttribute('aria-label', aria);
+    b.title = 'shift = ×10';
+    b.addEventListener('click', (e) => nudge(sign, axis, e.shiftKey));
+    return b;
+  };
+  if (reg.vector) {
+    for (const [axis, lbl] of [[0, 'x'], [1, 'y']]) {
+      const g = document.createElement('span'); g.className = 'step-grp';
+      g.append(`${lbl}`, mkBtn('−', -1, axis, `decrease ${lbl}`), mkBtn('+', +1, axis, `increase ${lbl}`));
+      stepper.appendChild(g);
+    }
+  } else {
+    const lbl = document.createElement('span');
+    lbl.className = 'step-lbl'; lbl.textContent = `±${step}`;
+    stepper.append(mkBtn('−', -1, 0, 'decrease'), lbl, mkBtn('+', +1, 0, 'increase'));
+  }
+  const fine = view.querySelector('.fine');
+  const tog = view.querySelector('.fine-tog');
+  tog.addEventListener('click', () => {
+    const on = fine.dataset.on === '1' ? '0' : '1';
+    fine.dataset.on = on;
+    tog.setAttribute('aria-pressed', on === '1' ? 'true' : 'false');
+  });
+
+  // ---- variations: extra instances of this control on its own tab ----
+  if (reg.variants?.length) {
+    const variations = view.querySelector('.variations');
+    variations.innerHTML = '<h3>variations</h3>';
+    const grid = document.createElement('div'); grid.className = 'var-grid';
+    variations.appendChild(grid);
+    for (const vr of reg.variants) {
+      const cell = document.createElement('div'); cell.className = 'var';
+      cell.innerHTML = `<span class="var-label">${vr.label}</span><div class="var-mount"></div>`;
+      grid.appendChild(cell);
+      reg.factory(cell.querySelector('.var-mount'), { ...structuredOpts(reg.opts), ...vr.opts, commit: 'live' });
+    }
+  }
 }
 
 // drop function-valued opts (onInput/onChange/format) from the JSON snapshot

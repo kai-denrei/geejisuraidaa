@@ -26,16 +26,18 @@ export function arcGauge(el, opts = {}) {
 
   const cx = 50, cy = 50, R = 40;
   el.classList.add('mp-arc');
+  if (o.variant) el.classList.add('mp-v-' + o.variant);
+  // Readout ABOVE the gauge (finger/cursor never hides it).
   el.innerHTML = `
+    <div class="mp-arc-row">
+      <span class="mp-arc-readout"></span>
+      <input class="mp-arc-input" type="text" inputmode="decimal" hidden/>
+    </div>
     <svg viewBox="0 0 100 60" class="mp-arc-svg" tabindex="0">
       <path class="mp-arc-bg" d="${arcPath(cx, cy, R, 180, 360)}" fill="none"/>
       <path class="mp-arc-fill" fill="none"/>
       <circle class="mp-arc-knob" r="4"/>
-    </svg>
-    <div class="mp-arc-row">
-      <span class="mp-arc-readout"></span>
-      <input class="mp-arc-input" type="text" inputmode="decimal" hidden/>
-    </div>`;
+    </svg>`;
   const svg = el.querySelector('.mp-arc-svg');
   const fillP = el.querySelector('.mp-arc-fill');
   const dot = el.querySelector('.mp-arc-knob');
@@ -49,6 +51,8 @@ export function arcGauge(el, opts = {}) {
     const n = clamp(m.toNorm(v), 0, 1);
     const ang = 180 + n * 180;
     fillP.setAttribute('d', n > 0.001 ? arcPath(cx, cy, R, 180, ang) : '');
+    // variant 'spectrum': color the sweep red→green by value.
+    if (o.variant === 'spectrum') fillP.style.stroke = `hsl(${Math.round(n * 120)} 70% 50%)`;
     const p = polar(cx, cy, R, ang);
     dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y);
     readout.textContent = model.format(v);

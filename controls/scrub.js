@@ -35,6 +35,7 @@ export function scrub(el, opts = {}) {
     : o.step;
 
   el.classList.add('mp-scrub');
+  if (o.variant) el.classList.add('mp-v-' + o.variant);
   el.innerHTML = `<span class="mp-scrub-readout" tabindex="0"></span><input class="mp-scrub-input" type="text" inputmode="decimal" hidden />`;
   const readout = el.querySelector('.mp-scrub-readout');
   const input = el.querySelector('.mp-scrub-input');

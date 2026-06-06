@@ -23,15 +23,17 @@ export function bipolar(el, opts = {}) {
   const m = mapper('bipolar', o.min, o.max);
 
   el.classList.add('mp-track', 'mp-bipolar');
+  if (o.variant) el.classList.add('mp-v-' + o.variant);
+  // Readout ABOVE the rail (finger/cursor never hides it).
   el.innerHTML = `
+    <div class="mp-track-row">
+      <span class="mp-track-readout"></span>
+      <input class="mp-track-input" type="text" inputmode="decimal" hidden />
+    </div>
     <div class="mp-track-rail" tabindex="0">
       <div class="mp-track-center"></div>
       <div class="mp-track-fill mp-bi-fill"></div>
       <div class="mp-track-thumb"></div>
-    </div>
-    <div class="mp-track-row">
-      <span class="mp-track-readout"></span>
-      <input class="mp-track-input" type="text" inputmode="decimal" hidden />
     </div>`;
   const rail = el.querySelector('.mp-track-rail');
   const fill = el.querySelector('.mp-bi-fill');
@@ -50,6 +52,8 @@ export function bipolar(el, opts = {}) {
     const a = Math.min(n, zeroN), b = Math.max(n, zeroN);
     fill.style.left = `${a * 100}%`;
     fill.style.width = `${(b - a) * 100}%`;
+    // variant 'split': color the fill by sign (teal − / amber +).
+    if (o.variant === 'split') fill.style.background = v < 0 ? 'var(--teal)' : v > 0 ? 'var(--amber)' : 'var(--muted)';
     el.classList.toggle('mp-detented', v === 0);
     readout.textContent = model.format(v);
     updateAria(rail, { norm: n, text: model.format(v) });

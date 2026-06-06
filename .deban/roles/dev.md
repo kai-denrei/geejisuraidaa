@@ -18,6 +18,9 @@ Implements `core/` helpers and the per-control modules to the §4 contract, the 
 | 2026-06-06 | xypad keeps `control()` contract via `dims:2`; get/set take `[x,y]` | Spec §9 lean — scalar contract, vectors declare `dims` and widen get/set. | [[arch]] |
 | 2026-06-06 | scrub per-pixel = range/~320px (floored at step), not the spec's literal dx*step | Bounded params needed a sane full-sweep budget; dx*step cost range/step px (1000px for the demo). step retained as precision floor + quantization. opt: `sweepPx`. | [[arch]] |
 | 2026-06-06 | knob sensitivity = full range over ~100px (≈ knob height), down from spec's ~180px | User feedback: apex required too long a drag. alt=fine still gives precision. opt: `sensitivityPx`. | |
+| 2026-06-06 | Readouts moved ABOVE every control (was below) | Anti-occlusion — finger/cursor on the thumb must not hide the value. | [[ux]] |
+| 2026-06-06 | Secondary +/- fine-tune built at the SHELL level (buildControlTab), acting via handle.get/set — NOT inside each factory | The §4 contract (get/set/opts.step) is sufficient; one stepper covers all 8 uniformly, vector controls get x/y pairs. Toggleable on/off. | [[arch]] |
+| 2026-06-06 | Per-tab variants via `opts.variant` → `mp-v-<name>` class; layout variants pure CSS, color variants (knob spectrum/intensity, arc spectrum, bipolar split, meter gradient) computed in render | Keeps each control self-contained (variant logic inlines into exported snippets). Registry `variants[]` drives the tab's variation gallery. | [[ux]] [[arch]] |
 
 ## Dead Ends
 <!-- APPEND ONLY. Never delete. -->
@@ -37,6 +40,7 @@ Blocked by: [[arch]] core helpers
 Feeds into: [[qa]]
 
 ## Session Log
+2026-06-06 — Round 3: readouts above all controls; toggleable +/- stepper (shell-level, via handle); per-tab variants (knob spectrum/intensity, log-slider rectangle thumb, meter gradation, bipolar sign-color, arc spectrum, ruler triangle, xypad grid, scrub boxed). Token → 34edc88c.
 2026-06-06 — Tuned knob (≈100px full sweep) and scrub (range/320px per-pixel) sensitivity per owner feedback; both now have tunable opts.
 2026-06-06 — Built core/ + all 8 controls to §4 contract, full-width-digit NFKC entry, both export buttons per control. All pass node --check.
 2026-06-06 — Init.
