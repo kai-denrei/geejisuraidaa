@@ -1,80 +1,40 @@
-// app/unicode-bars.js — Unicode text progress bars, after Changaco's
-// "unicode-progress-bars" (https://changaco.oy.lc/unicode-progress-bars/).
+// app/unicode-bars.js — minimalist Unicode progress bars.
 //
-// Bare-bones: each bar is plain text assembled from a symbol ramp
-// (symbols[0] = empty … symbols[m] = full), using the fractional-cell trick so a
-// single character can show a partial fill. Interactive + BOUND: every row has
-// its own slider, and the bar itself is draggable; moving any one drives a
-// single shared fraction so all bars and all sliders move together.
+// Black background, white glyphs only. No sliders, no labels: each bar IS the
+// control — drag it left/right (or arrow-key it) to set the value. All bars
+// share one fraction, so dragging any one moves them all.
+//
+// Each style is a 2-symbol ramp [empty, full]; the filled run grows from the
+// left. Filled and empty are different *shapes*, so no color is needed.
 
-const WIDTH = 28; // cells per bar
+const WIDTH = 14; // cells per bar
 
-const SETS = [
-  { name: 'eighths',  symbols: ' ▏▎▍▌▋▊▉█' },
-  { name: 'shades',   symbols: '░▒▓█' },
-  { name: 'vertical', symbols: ' ▁▂▃▄▅▆▇█' },
-  { name: 'braille',  symbols: ' ⡀⡄⡆⡇⣇⣧⣷⣿' },
-  { name: 'circles',  symbols: '○◔◑◕●' },
-  { name: 'blocks',   symbols: '▱▰' },
-  { name: 'ascii',    symbols: ' .:=+#' },
-  { name: 'hash',     symbols: '·#' },
+const STYLES = [
+  ['□', '▨'],
+  ['○', '◐'],
+  ['▯', '▮'],
+  ['▁', '▄'],
 ];
 
 const clamp01 = (p) => (p < 0 ? 0 : p > 1 ? 1 : p);
 
-// Changaco's algorithm. Returns the filled run (full cells + one partial cell)
-// and the empty run, split so each can be colored independently.
-function renderBar(p, length, symbols) {
-  const sy = Array.from(symbols);
-  const m = sy.length - 1;
-  const x = clamp01(p) * length;
-  const full = Math.floor(x);
-  const rest = x - full;
-  let filled = sy[m].repeat(full);
-  let used = full;
-  if (rest > 0 && full < length) {
-    filled += sy[Math.floor(rest * m)] || sy[0];
-    used += 1;
-  }
-  const empty = sy[0].repeat(Math.max(0, length - used));
-  return { filled, empty };
-}
-
 export function unicodeBars(view) {
-  view.innerHTML = `
-    <div class="tabpanel-head"><h2>Unicode bars</h2></div>
-    <p class="earns">Progress bars built from nothing but text. Drag any slider — or any bar —
-      and they all move. <a href="https://changaco.oy.lc/unicode-progress-bars/" target="_blank" rel="noopener">after Changaco</a>.</p>
-    <div class="ub-readout"><span class="ub-val">0.50</span> · <span class="ub-pctbig">50%</span></div>
-    <div class="ub-list"></div>`;
-  const valEl = view.querySelector('.ub-val');
-  const pctBig = view.querySelector('.ub-pctbig');
-  const list = view.querySelector('.ub-list');
+  view.classList.add('ub-tab');
+  view.innerHTML = '<div class="ub-stack"></div>';
+  const stack = view.querySelector('.ub-stack');
 
   let frac = 0.5;
-  const rows = [];
+  const bars = [];
 
-  for (const set of SETS) {
-    const row = document.createElement('div');
-    row.className = 'ub-row';
-    row.innerHTML = `
-      <span class="ub-name">${set.name}</span>
-      <div class="ub-mid">
-        <div class="ub-bar"><span class="ub-filled"></span><span class="ub-empty"></span></div>
-        <input class="ub-range" type="range" min="0" max="1000" step="1" aria-label="${set.name} progress">
-      </div>
-      <span class="ub-pct"></span>`;
-    list.appendChild(row);
+  for (const [empty, full] of STYLES) {
+    const bar = document.createElement('div');
+    bar.className = 'ub-bar';
+    bar.tabIndex = 0;
+    bar.setAttribute('role', 'slider');
+    bar.setAttribute('aria-valuemin', '0');
+    bar.setAttribute('aria-valuemax', '100');
+    stack.appendChild(bar);
 
-    const filledEl = row.querySelector('.ub-filled');
-    const emptyEl = row.querySelector('.ub-empty');
-    const range = row.querySelector('.ub-range');
-    const pct = row.querySelector('.ub-pct');
-    const bar = row.querySelector('.ub-bar');
-
-    range.addEventListener('input', () => setFrac(range.value / 1000, range));
-
-    // the bar is also a draggable absolute slider
     let dragging = false;
     const fromX = (clientX) => {
       const r = bar.getBoundingClientRect();
@@ -84,22 +44,24 @@ export function unicodeBars(view) {
     bar.addEventListener('pointermove', (e) => { if (dragging) fromX(e.clientX); });
     bar.addEventListener('pointerup', () => { dragging = false; });
     bar.addEventListener('pointercancel', () => { dragging = false; });
+    bar.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { setFrac(frac + 1 / WIDTH); e.preventDefault(); }
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { setFrac(frac - 1 / WIDTH); e.preventDefault(); }
+      else if (e.key === 'Home') { setFrac(0); e.preventDefault(); }
+      else if (e.key === 'End') { setFrac(1); e.preventDefault(); }
+    });
 
-    rows.push({ set, filledEl, emptyEl, range, pct });
+    bars.push({ bar, empty, full });
   }
 
-  function setFrac(p, except) {
+  function setFrac(p) {
     frac = clamp01(p);
-    const pctTxt = Math.round(frac * 100) + '%';
-    for (const r of rows) {
-      const { filled, empty } = renderBar(frac, WIDTH, r.set.symbols);
-      r.filledEl.textContent = filled;
-      r.emptyEl.textContent = empty;
-      r.pct.textContent = pctTxt;
-      if (r.range !== except) r.range.value = Math.round(frac * 1000);
+    const n = Math.round(frac * WIDTH);
+    const now = String(Math.round(frac * 100));
+    for (const b of bars) {
+      b.bar.textContent = b.full.repeat(n) + b.empty.repeat(WIDTH - n);
+      b.bar.setAttribute('aria-valuenow', now);
     }
-    valEl.textContent = frac.toFixed(2);
-    pctBig.textContent = pctTxt;
   }
 
   setFrac(frac);
