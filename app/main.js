@@ -8,6 +8,8 @@ import { REGISTRY } from './registry.js';
 import { buildSnippet, download } from './snippet.js';
 import { mapper, clamp } from '../core/map.js';
 import { unicodeBars } from './unicode-bars.js';
+import { sevensegBars } from './sevenseg-bars.js';
+import { kanjiBars } from './kanji-bars.js';
 
 const tabsEl = document.querySelector('nav.tabs');
 const viewsEl = document.querySelector('#views');
@@ -261,6 +263,8 @@ function stripFns(opts) {
 // ---------- boot ----------
 buildLanding();
 unicodeBars(makeTab('unicode', 'unicode bars')); // separate tab, its own bound state
+sevensegBars(makeTab('sevenseg', 'segments')); // experimental: seven-seg center bars
+kanjiBars(makeTab('kanji', 'kanji'));          // experimental: 一〜十 number slider
 for (const reg of REGISTRY) buildControlTab(reg);
 
 const initial = location.hash.replace('#', '') || 'bench';
