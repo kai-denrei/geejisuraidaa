@@ -372,18 +372,37 @@ button.btn:hover { border-color: var(--amber); color: var(--amber); }
 /* ===================================================================
    KANJI NUMBER SLIDER TAB (experimental) — 一〜十, lit on activation
    =================================================================== */
-.kanji-tab.view { background: #000; margin: 0 -28px; padding: 64px 28px; }
+.kanji-tab.view { background: #000; margin: 0 -28px; padding: 60px 28px; text-align: center; }
+/* inline-flex so the row hugs the glyphs: drag maps 0 just-left-of-一,
+   1 just-right-of-十 (the 14px padding is the dead zone at each end). */
 .kanji-row {
-  display: flex; justify-content: center; flex-wrap: wrap; gap: 16px;
+  display: inline-flex; flex-wrap: nowrap; gap: 16px; padding: 0 14px;
   font-family: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
-  font-size: 44px; line-height: 1; touch-action: none; cursor: ew-resize;
-  user-select: none; outline: none;
+  line-height: 1; touch-action: none; cursor: ew-resize; outline: none;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.kanji-row:focus-visible { outline: 1px solid #1bf0c8; outline-offset: 10px; }
-.kanji { color: #232323; transition: color .1s ease, text-shadow .1s ease; }
-.kanji.on { color: #e6fffa; text-shadow: 0 0 6px #1bf0c8, 0 0 16px #1bf0c8, 0 0 32px rgba(27, 240, 200, .55); }
+.kanji-row:focus-visible { outline: 1px solid var(--k-color, #1bf0c8); outline-offset: 10px; }
+.kanji {
+  color: var(--k-off, hsl(0 0% 14%)); font-size: var(--k-size, 44px);
+  user-select: none; -webkit-user-select: none;
+  transition: color .1s ease, text-shadow .1s ease;
+}
+.kanji.on {
+  color: color-mix(in srgb, var(--k-color, #1bf0c8) 35%, #fff);
+  text-shadow:
+    0 0 calc(var(--k-glow, 16px) * .35) var(--k-color, #1bf0c8),
+    0 0 var(--k-glow, 16px) var(--k-color, #1bf0c8),
+    0 0 calc(var(--k-glow, 16px) * 2) var(--k-color, #1bf0c8);
+}
+.kanji-ctrls { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; margin-top: 46px; }
+.kanji-ctrls label { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: #7a7a7a; letter-spacing: .05em; }
+.kanji-ctrls input[type="range"] { width: 110px; accent-color: var(--k-color, #1bf0c8); cursor: pointer; }
+.kanji-ctrls input[type="color"] { width: 30px; height: 24px; padding: 0; border: 1px solid #333; background: none; cursor: pointer; border-radius: 4px; }
 @media (max-width: 640px) {
   .seg-tab.view, .kanji-tab.view { margin: 0 -16px; padding: 36px 16px; }
   .seg-canvas { height: 84px; }
-  .kanji-row { font-size: 32px; gap: 10px; }
+  .kanji-row { gap: 9px; }
+  .kanji-ctrls { gap: 14px; }
+  .kanji-ctrls input[type="range"] { width: 84px; }
 }
