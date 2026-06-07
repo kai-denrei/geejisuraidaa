@@ -1,9 +1,8 @@
-// app/sevenseg-bars.js — experimental tab. Ports the *center segment* (the 'g'
-// bar) and the emissive glow from the dexipurei seven-segment module
-// (sevenseg-standalone.html): an elongated rounded-tip hex bar with a glow pass
-// + white hot core. Ten bars laid in a row form a 0–100% meter:
+// app/sevenseg-bars.js — experimental tab + reusable strip. Ports the *center
+// segment* (the 'g' bar) and the emissive glow from the dexipurei seven-segment
+// module (sevenseg-standalone.html): an elongated rounded-tip hex bar with a
+// glow pass + white hot core. Ten bars in a row form a 0–100% meter:
 //   bar off = 0% · bar dimly lit = 5% · bar fully lit = 10% · 10 bars = 100%.
-// Drag across it (or arrow-key) to set the value in 5% steps.
 
 const COLOR = '#1bf0c8';   // VFD teal (sevenseg default)
 const BG = '#05100e';
@@ -27,7 +26,7 @@ function vhex(ctx, x1, y1, x2, y2, th) {
 
 // one center segment, with the sevenseg glow passes. bright: 0..1; 0 = off ghost.
 function drawBar(ctx, x1, y1, x2, y2, th, bright) {
-  if (bright <= 0) { // off-segment ghost (faint full bar behind)
+  if (bright <= 0) {
     ctx.shadowBlur = 0; ctx.globalAlpha = 0.05; ctx.fillStyle = COLOR;
     vhex(ctx, x1, y1, x2, y2, th * 0.9); ctx.fill(); ctx.globalAlpha = 1;
     return;
@@ -41,14 +40,21 @@ function drawBar(ctx, x1, y1, x2, y2, th, bright) {
   ctx.globalAlpha = 1; ctx.shadowBlur = 0;
 }
 
-export function sevensegBars(view) {
-  view.classList.add('seg-tab');
-  view.innerHTML = '<canvas class="seg-canvas" tabindex="0" role="slider" aria-valuemin="0" aria-valuemax="100"></canvas>';
-  const cv = view.querySelector('.seg-canvas');
+// Reusable canvas strip. Returns { el, setNorm(n), onInput(fn) }. onInput fires
+// on user drag/keys with the new fraction [0,1]; setNorm renders silently.
+export function segStrip(mount, opts = {}) {
+  const cv = document.createElement('canvas');
+  cv.className = opts.className || 'seg-canvas';
+  cv.tabIndex = 0;
+  cv.setAttribute('role', 'slider');
+  cv.setAttribute('aria-valuemin', '0');
+  cv.setAttribute('aria-valuemax', '100');
+  mount.appendChild(cv);
   const ctx = cv.getContext('2d');
 
-  let value = 40; // percent, 0..100 in 5% steps
+  let value = Math.round(((opts.value ?? 0.4) * 100) / 5) * 5; // percent, 5% steps
   let dpr = 1;
+  let cb = null;
 
   function draw() {
     const w = cv.width / dpr, h = cv.height / dpr;
@@ -56,20 +62,17 @@ export function sevensegBars(view) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = BG; ctx.fillRect(0, 0, w, h);
-
     const pad = Math.min(w * 0.04, 28);
-    const gap = Math.max(8, w * 0.018);
+    const gap = Math.max(6, w * 0.018);
     const bw = (w - pad * 2 - gap * (N - 1)) / N;
-    const th = Math.min(h * 0.46, bw * 0.42, 24);
+    const th = Math.min(h * 0.5, bw * 0.42, 24);
     const y = h / 2;
-
     const full = Math.floor(value / 10);
     const rem = value - full * 10;
     const dimIdx = rem >= 5 ? full : -1;
-
     for (let i = 0; i < N; i++) {
       const x = pad + i * (bw + gap);
-      const bright = i < full ? 1 : i === dimIdx ? 0.42 : 0; // full / dim / off
+      const bright = i < full ? 1 : i === dimIdx ? 0.42 : 0;
       drawBar(ctx, x, y, x + bw, y, th, bright);
     }
     cv.setAttribute('aria-valuenow', String(value));
@@ -89,6 +92,7 @@ export function sevensegBars(view) {
     const p = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
     value = Math.round((p * 100) / 5) * 5;
     draw();
+    if (cb) cb(value / 100);
   };
   let dragging = false;
   cv.addEventListener('pointerdown', (e) => { dragging = true; cv.setPointerCapture(e.pointerId); setFromX(e.clientX); });
@@ -96,16 +100,31 @@ export function sevensegBars(view) {
   cv.addEventListener('pointerup', () => { dragging = false; });
   cv.addEventListener('pointercancel', () => { dragging = false; });
   cv.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { value = Math.min(100, value + 5); draw(); e.preventDefault(); }
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { value = Math.max(0, value - 5); draw(); e.preventDefault(); }
-    else if (e.key === 'Home') { value = 0; draw(); e.preventDefault(); }
-    else if (e.key === 'End') { value = 100; draw(); e.preventDefault(); }
+    let v = value;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') v = Math.min(100, value + 5);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') v = Math.max(0, value - 5);
+    else if (e.key === 'Home') v = 0;
+    else if (e.key === 'End') v = 100;
+    else return;
+    e.preventDefault();
+    value = v; draw(); if (cb) cb(value / 100);
   });
 
-  // redraw when the tab gains size (it boots hidden) or the window resizes
   new ResizeObserver(size).observe(cv);
   window.addEventListener('resize', size);
   size();
+
+  return {
+    el: cv,
+    setNorm(n) { value = Math.round((Math.max(0, Math.min(1, n)) * 100) / 5) * 5; draw(); },
+    onInput(fn) { cb = fn; },
+  };
+}
+
+export function sevensegBars(view) {
+  view.classList.add('seg-tab');
+  view.innerHTML = '';
+  segStrip(view, { className: 'seg-canvas' });
 }
 
 export default sevensegBars;

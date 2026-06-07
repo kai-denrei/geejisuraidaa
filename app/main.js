@@ -7,9 +7,9 @@
 import { REGISTRY } from './registry.js';
 import { buildSnippet, download } from './snippet.js';
 import { mapper, clamp } from '../core/map.js';
-import { unicodeBars } from './unicode-bars.js';
-import { sevensegBars } from './sevenseg-bars.js';
-import { kanjiBars } from './kanji-bars.js';
+import { unicodeBars, unicodeCell } from './unicode-bars.js';
+import { sevensegBars, segStrip } from './sevenseg-bars.js';
+import { kanjiBars, kanjiStrip } from './kanji-bars.js';
 
 const tabsEl = document.querySelector('nav.tabs');
 const viewsEl = document.querySelector('#views');
@@ -55,73 +55,73 @@ function structuredOpts(opts) {
 }
 
 // ---------- bench (bound) ----------
+// Every participant — the 8 controls plus the unicode / seven-seg / kanji
+// displays — shares one normalized [0,1] value. A participant exposes
+// setNorm(n) (render silently) and is wired to broadcast on user input. Endpoints
+// align; each maps the shared norm through its own taper.
 function buildLanding() {
   const view = makeTab('bench', 'bench');
   view.innerHTML = `
     <div class="tabpanel-head"><h2>Bench</h2></div>
-    <p class="landing-lede">Eight controls, one value. Drag any — they all move.</p>
+    <p class="landing-lede">Controls and displays, one value. Drag any — they all move.</p>
     <div class="compare-grid"></div>
     <p class="landing-note">Open a tab for the full control, readout, and export.</p>`;
   const grid = view.querySelector('.compare-grid');
 
-  const cells = [];
-  for (const reg of REGISTRY) {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    cell.innerHTML = `
-      <div class="cell-head"><span class="cell-name">${reg.name}</span></div>
-      <div class="cell-mount"></div>
-      <div class="cell-val">—</div>`;
-    grid.appendChild(cell);
-    const mount = cell.querySelector('.cell-mount');
-    const valEl = cell.querySelector('.cell-val');
-    const h = reg.factory(mount, { ...structuredOpts(reg.opts), commit: 'live' });
-    const o = h.opts;
-    const rec = {
-      reg, h, valEl,
-      m: mapper(o.map, o.min, o.max),
-      min: o.min, span: o.max - o.min,
-      vector: !!reg.vector,
-      show: () => { valEl.textContent = fmtVal(reg, h.get()); },
-    };
-    rec.show();
-    cells.push(rec);
-    const nameEl = cell.querySelector('.cell-name');
-    nameEl.style.cursor = 'pointer';
-    nameEl.addEventListener('click', () => select(reg.id));
-  }
-
-  // Bind: one normalized position [0,1] drives all. Endpoints align (min↔min,
-  // max↔max); each control maps the shared norm through its own taper. xypad is
-  // the exception — only its horizontal axis links; the vertical does nothing.
+  const parts = [];
   let syncing = false;
-  const normOf = (rec) =>
-    rec.vector
-      ? clamp((rec.h.get()[0] - rec.min) / rec.span, 0, 1)
-      : clamp(rec.m.toNorm(rec.h.get()), 0, 1);
-  const applyNorm = (rec, n) => {
-    if (rec.vector) {
-      const cur = rec.h.get();
-      rec.h.set([rec.min + n * rec.span, cur[1]]); // x linked, y inert
-    } else {
-      rec.h.set(rec.m.toValue(n));
-    }
-    rec.show();
-  };
-  const broadcast = (n, srcId) => {
+  const broadcast = (n, src) => {
     syncing = true;
-    for (const rec of cells) if (rec.reg.id !== srcId) applyNorm(rec, n);
+    for (const p of parts) if (p !== src) p.setNorm(n);
     syncing = false;
   };
-  for (const rec of cells) {
-    rec.h.on((v, kind) => {
-      rec.show();
-      if (syncing || kind === 'set') return;
-      broadcast(normOf(rec), rec.reg.id);
-    });
+
+  const addCell = (name, tabId, kind = {}) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (kind.wide ? ' cell-wide' : '');
+    cell.innerHTML = `
+      <div class="cell-head"><span class="cell-name">${name}</span></div>
+      <div class="cell-mount${kind.dark ? ' cell-dark' : ''}"></div>
+      <div class="cell-val">—</div>`;
+    grid.appendChild(cell);
+    const nameEl = cell.querySelector('.cell-name');
+    nameEl.style.cursor = 'pointer';
+    nameEl.addEventListener('click', () => select(tabId));
+    return { mount: cell.querySelector('.cell-mount'), valEl: cell.querySelector('.cell-val') };
+  };
+
+  // --- the eight controls ---
+  for (const reg of REGISTRY) {
+    const { mount, valEl } = addCell(reg.name, reg.id);
+    const h = reg.factory(mount, { ...structuredOpts(reg.opts), commit: 'live' });
+    const o = h.opts, m = mapper(o.map, o.min, o.max), min = o.min, span = o.max - o.min, vector = !!reg.vector;
+    const show = () => { valEl.textContent = fmtVal(reg, h.get()); };
+    const normOf = () => (vector ? clamp((h.get()[0] - min) / span, 0, 1) : clamp(m.toNorm(h.get()), 0, 1));
+    const part = {
+      setNorm(n) {
+        if (vector) { const c = h.get(); h.set([min + n * span, c[1]]); } else h.set(m.toValue(n));
+        show();
+      },
+    };
+    h.on((v, kind) => { show(); if (syncing || kind === 'set') return; broadcast(normOf(), part); });
+    parts.push(part);
   }
+
+  // --- the three displays (full-width rows, same bound value) ---
+  const addDisplay = (name, tabId, dark, makeStrip) => {
+    const { mount, valEl } = addCell(name, tabId, { wide: true, dark });
+    const strip = makeStrip(mount);
+    const show = (n) => { valEl.textContent = Math.round(n * 100) + '%'; };
+    const part = { setNorm(n) { strip.setNorm(n); show(n); } };
+    strip.onInput((n) => { show(n); if (!syncing) broadcast(n, part); });
+    parts.push(part);
+  };
+  const small = window.innerWidth < 640;
+  addDisplay('unicode', 'unicode', false, (mt) => unicodeCell(mt, { symbols: '░▒▓█', width: small ? 18 : 28 }));
+  addDisplay('segments', 'sevenseg', true, (mt) => segStrip(mt, { className: 'seg-cell-canvas' }));
+  addDisplay('kanji', 'kanji', true, (mt) => kanjiStrip(mt, { controls: false, size: small ? 20 : 30, glow: 12 }));
+
   broadcast(0.5, null); // aligned start
-  for (const rec of cells) rec.show();
 }
 
 // ---------- per-control tabs ----------

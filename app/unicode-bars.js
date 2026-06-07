@@ -21,7 +21,7 @@ const STYLES = [
 
 const clamp01 = (p) => (p < 0 ? 0 : p > 1 ? 1 : p);
 
-// Changaco's fractional-cell algorithm. Returns a WIDTH-cell string.
+// Changaco's fractional-cell algorithm. Returns a `length`-cell string.
 function renderBar(p, length, symbols) {
   const sy = Array.from(symbols);
   const m = sy.length - 1;
@@ -84,6 +84,43 @@ export function unicodeBars(view) {
   }
 
   setFrac(frac);
+}
+
+// Reusable single-bar cell for the bench. Returns { setNorm(n), onInput(fn) }.
+export function unicodeCell(mount, opts = {}) {
+  const symbols = opts.symbols || '░▒▓█';
+  const W = opts.width || 24;
+  const bar = document.createElement('div');
+  bar.className = 'ub-cell';
+  bar.tabIndex = 0;
+  bar.setAttribute('role', 'slider');
+  bar.setAttribute('aria-valuemin', '0');
+  bar.setAttribute('aria-valuemax', '100');
+  mount.appendChild(bar);
+
+  let cb = null;
+  let dragging = false;
+  const fromX = (clientX) => {
+    const r = bar.getBoundingClientRect();
+    if (cb) cb(clamp01((clientX - r.left) / r.width));
+  };
+  bar.addEventListener('pointerdown', (e) => { dragging = true; bar.setPointerCapture(e.pointerId); fromX(e.clientX); });
+  bar.addEventListener('pointermove', (e) => { if (dragging) fromX(e.clientX); });
+  bar.addEventListener('pointerup', () => { dragging = false; });
+  bar.addEventListener('pointercancel', () => { dragging = false; });
+  bar.addEventListener('keydown', (e) => {
+    const cur = (Number(bar.getAttribute('aria-valuenow')) || 0) / 100;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { cb && cb(clamp01(cur + 1 / W)); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { cb && cb(clamp01(cur - 1 / W)); e.preventDefault(); }
+  });
+
+  return {
+    setNorm(n) {
+      bar.textContent = renderBar(clamp01(n), W, symbols);
+      bar.setAttribute('aria-valuenow', String(Math.round(clamp01(n) * 100)));
+    },
+    onInput(fn) { cb = fn; },
+  };
 }
 
 export default unicodeBars;
