@@ -365,7 +365,7 @@ button.btn:hover { border-color: var(--amber); color: var(--amber); }
 /* ===================================================================
    SEVEN-SEGMENT BARS TAB (experimental) — center segments + VFD glow
    =================================================================== */
-.seg-tab.view { background: #000; margin: 0 -28px; padding: 44px 28px; }
+.seg-tab.view { background: #020a10; margin: 0 -28px; padding: 44px 28px; }
 .seg-canvas { display: block; width: 100%; height: 110px; cursor: ew-resize; touch-action: none; outline: none; }
 .seg-canvas:focus-visible { outline: 1px solid #1bf0c8; outline-offset: 4px; }
 
