@@ -7,6 +7,7 @@
 import { REGISTRY } from './registry.js';
 import { buildSnippet, download } from './snippet.js';
 import { mapper, clamp } from '../core/map.js';
+import { unicodeBars } from './unicode-bars.js';
 
 const tabsEl = document.querySelector('nav.tabs');
 const viewsEl = document.querySelector('#views');
@@ -259,6 +260,7 @@ function stripFns(opts) {
 
 // ---------- boot ----------
 buildLanding();
+unicodeBars(makeTab('unicode', 'unicode bars')); // separate tab, its own bound state
 for (const reg of REGISTRY) buildControlTab(reg);
 
 const initial = location.hash.replace('#', '') || 'bench';
